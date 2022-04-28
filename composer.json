@@ -1,0 +1,36 @@
+{
+    "name": "rotoos/think-core",
+    "description": "ThinkCore",
+    "type": "library",
+    "require": {
+        "ext-gd": "*",
+        "ext-curl": "*",
+        "ext-json": "*",
+        "ext-iconv": "*",
+        "ext-openssl": "*",
+        "ext-mbstring": "*",
+        "topthink/framework": "^6.0"
+    },
+    "license": "MIT",
+    "autoload": {
+        "files": [
+            "src/common.php"
+          ],
+        "psr-4": {
+            "think\\admin\\": "src/"
+        }
+    },
+    "authors": [
+        {
+            "name": "rotoos"
+        }
+    ],
+    "extra": {
+        "think": {
+          "services": [
+            "think\\admin\\Library"
+          ]
+        }
+      },
+    "minimum-stability": "dev"
+}

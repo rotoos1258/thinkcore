@@ -46,22 +46,22 @@ class SystemBase extends Model
      * @param string $bind 绑定字段
      * @return array
      */
-    public function items(string $type, array &$data = [], string $field = 'base_code', string $bind = 'base_info'): array
+    public static function items(string $type, array &$data = [], string $field = 'base_code', string $bind = 'base_info'): array
     {
         $map = ['type' => $type, 'status' => 1, 'deleted' => 0];
-        $bases = $this->where($map)->order('sort desc,id asc')->column('code,name,content', 'code');
+        $bases = static::mk()->where($map)->order('sort desc,id asc')->column('code,name,content', 'code');
         if (count($data) > 0) foreach ($data as &$vo) $vo[$bind] = $bases[$vo[$field]] ?? [];
         return $bases;
     }
 
     /**
      * 获取所有数据类型
-     * @param boolean $simple
+     * @param boolean $simple 加载默认值
      * @return array
      */
-    public function types(bool $simple = false): array
+    public static function types(bool $simple = false): array
     {
-        $types = $this->where(['deleted' => 0])->distinct(true)->column('type');
+        $types = static::mk()->where(['deleted' => 0])->distinct(true)->column('type');
         if (empty($types) && empty($simple)) $types = ['身份权限'];
         return $types;
     }

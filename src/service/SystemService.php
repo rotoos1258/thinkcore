@@ -23,6 +23,8 @@ use think\admin\Helper;
 use think\admin\model\SystemConfig;
 use think\admin\model\SystemData;
 use think\admin\model\SystemOplog;
+use think\admin\multiple\BuildUrl;
+use think\admin\multiple\Route;
 use think\admin\Service;
 use think\admin\storage\LocalStorage;
 use think\App;
@@ -43,6 +45,44 @@ class SystemService extends Service
      * @var array
      */
     protected $data = [];
+
+    /**
+     * 系统服务初始化
+     * @return void
+     */
+    protected function initialize()
+    {
+        // 替换 ThinkPHP 地址
+        $this->app->bind('think\Route', Route::class);
+        $this->app->bind('think\route\Url', BuildUrl::class);
+    }
+
+    /**
+     * 生成静态路径链接
+     * @param string $path 后缀路径
+     * @param ?string $type 路径类型
+     * @param mixed $default 默认数据
+     * @return string|array
+     */
+    public function uri(string $path = '', ?string $type = '__ROOT__', $default = '')
+    {
+        static $app, $root, $full;
+        empty($app) && $app = rtrim(url('@')->build(), '\\/');
+        empty($root) && $root = rtrim(dirname($this->app->request->basefile()), '\\/');
+        empty($full) && $full = rtrim(dirname($this->app->request->basefile(true)), '\\/');
+        $data = ['__APP__' => $app . $path, '__ROOT__' => $root . $path, '__FULL__' => $full . $path];
+        return is_null($type) ? $data : ($data[$type] ?? $default);
+    }
+
+    /**
+     * 生成全部静态路径
+     * @param string $path
+     * @return string[]
+     */
+    public function uris(string $path = ''): array
+    {
+        return $this->uri($path, null);
+    }
 
     /**
      * 设置配置数据
@@ -228,9 +268,28 @@ class SystemService extends Service
     public function getData(string $name, $default = [])
     {
         try {
+            // 读取原始序列化数据
             $value = SystemData::mk()->where(['name' => $name])->value('value');
-            return is_null($value) ? $default : unserialize($value);
+            if (is_null($value)) return $default;
         } catch (\Exception $exception) {
+            trace_file($exception);
+            return $default;
+        }
+        try {
+            // 尝试正常反序列解析
+            return unserialize($value);
+        } catch (\Exception $exception) {
+            trace_file($exception);
+        }
+        try {
+            // 尝试修复反序列解析
+            $unit = 'i:\d+;|b:[01];|s:\d+:".*?";|O:\d+:".*?":\d+:\{';
+            $preg = '/(?=^|' . $unit . ')s:(\d+):"(.*?)";(?=' . $unit . '|}+$)/';
+            return unserialize(preg_replace_callback($preg, function ($attr) {
+                return sprintf('s:%d:"%s";', strlen($attr[2]), $attr[2]);
+            }, $value));
+        } catch (\Exception $exception) {
+            trace_file($exception);
             return $default;
         }
     }
@@ -349,7 +408,7 @@ class SystemService extends Service
     }
 
     /**
-     * 判断实时运行模式
+     * 是否为开发模式运行
      * @return boolean
      */
     public function isDebug(): bool
@@ -414,10 +473,6 @@ class SystemService extends Service
         return $this->app->debug($data['mode'] !== 'product')->isDebug();
     }
 
-    /**
-     * 
-     */
-    
     /**
      * 初始化并运行主程序
      * @param null|App $app

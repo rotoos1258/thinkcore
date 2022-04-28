@@ -48,9 +48,9 @@ class SystemUser extends Model
      * @param string $fields 关联数据字段
      * @return array
      */
-    public function items($map, array &$data = [], string $field = 'uuid', string $target = 'user_info', string $fields = 'username,nickname,headimg,status,is_deleted'): array
+    public static function items($map, array &$data = [], string $field = 'uuid', string $target = 'user_info', string $fields = 'username,nickname,headimg,status,is_deleted'): array
     {
-        $query = $this->where($map)->order('sort desc,id desc');
+        $query = static::mk()->where($map)->order('sort desc,id desc');
         if (count($data) > 0) {
             $users = $query->whereIn('id', array_unique(array_column($data, $field)))->column($fields, 'id');
             foreach ($data as &$vo) $vo[$target] = $users[$vo[$field]] ?? [];
@@ -79,10 +79,10 @@ class SystemUser extends Model
     public function getHeadimgAttr($value): string
     {
         if (empty($value)) try {
-            $host = sysconf('base.site_host') ?: 'https://v6.thinkadmin.top';
+            $host = sysconf('base.site_host') ?: 'http://deadmin.cn';
             return "{$host}/static/theme/img/headimg.png";
         } catch (\Exception $exception) {
-            return "https://v6.thinkadmin.top/static/theme/img/headimg.png";
+            return "http://deadmin.cn/static/theme/img/headimg.png";
         } else {
             return $value;
         }

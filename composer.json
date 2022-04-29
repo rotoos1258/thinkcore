@@ -31,6 +31,5 @@
             "think\\admin\\Library"
           ]
         }
-      },
-    "minimum-stability": "dev"
+      }
 }

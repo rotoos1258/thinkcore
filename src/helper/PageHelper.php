@@ -1,17 +1,5 @@
 <?php
 
-// +----------------------------------------------------------------------
-// | Library for ThinkAdmin
-// +----------------------------------------------------------------------
-// | 版权所有 2014~2022 广州楚才信息科技有限公司 [ http://www.cuci.cc ]
-// +----------------------------------------------------------------------
-// | 官方网站: https://gitee.com/zoujingli/ThinkLibrary
-// +----------------------------------------------------------------------
-// | 开源协议 ( https://mit-license.org )
-// +----------------------------------------------------------------------
-// | gitee 仓库地址 ：https://gitee.com/zoujingli/ThinkLibrary
-// | github 仓库地址 ：https://github.com/zoujingli/ThinkLibrary
-// +----------------------------------------------------------------------
 
 declare (strict_types=1);
 
@@ -56,32 +44,13 @@ class PageHelper extends Helper
                     $this->app->cookie->set('limit', ($limit = intval($limit >= 5 ? $limit : 20)) . '');
                 }
             }
-            //$inner = strpos($get['spm'] ?? '', 'm-') === 0;
-            //$prefix = $inner ? (sysuri('admin/index/index') . '#') : '';
             // 生成分页数据
             $data = ($paginate = $query->paginate(['list_rows' => $limit, 'query' => $get], $this->getCount($query, $total)))->toArray();
             $result = ['page' => ['limit' => $data['per_page'], 'total' => $data['total'], 'pages' => $data['last_page'], 'current' => $data['current_page']], 'list' => $data['data']];
             // 分页跳转参数
-            //$select = "<select onchange='location.href=this.options[this.selectedIndex].value'>";
-            //if (in_array($limit, $limits)) foreach ($limits as $num) {
-                //$url = $this->app->request->baseUrl() . '?' . http_build_query(array_merge($get, ['limit' => $num, 'page' => 1]));
-                //$select .= sprintf('<option data-num="%d" value="%s" %s>%d</option>', $num, $prefix . $url, $limit === $num ? 'selected' : '', $num);
-            //} else {
-                //$select .= "<option selected>{$limit}</option>";
-            //}
-            //$html = lang('think_library_page_html', [$data['total'], "{$select}</select>", $data['last_page'], $data['current_page']]);
-            //$link = $inner ? str_replace('<a href=', '<a data-open=', $paginate->render() ?: '') : ($paginate->render() ?: '');
-            //$this->class->assign('pagehtml', "<div class='pagination-container nowrap'><span>{$html}</span>{$link}</div>");
         } else {
             $result = ['list' => $query->select()->toArray()];
         }
-        /*if (false !== $this->class->callback('_page_filter', $result['list'], $result) && $display) {
-            if ($this->output === 'get.json') {
-                $this->class->success('JSON-DATA', $result);
-            } else {
-                $this->class->fetch($template, $result);
-            }
-        }*/
         if (false !== $this->class->callback('_page_filter', $result['list'], $result)) {
             if ($this->output === 'get.json') {
                 $this->class->success('JSON-DATA', $result);

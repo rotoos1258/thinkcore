@@ -6,7 +6,7 @@ use think\admin\Model;
 
 /**
  * 岗位数据模型
- * Class SystemDept
+ * Class SysDept
  * @package think\admin\model
  */
 class SysDept extends Model

@@ -38,9 +38,7 @@ class DataScopeService extends Service
         }
         $role_ids = SysUserRole::mk()->where(['user_id' => $userid])->column('role_id');
         $roles = SysRole::mk()->whereIn('id',$role_ids)->select()->toArray();
-        p($role_ids);
         return $this->getDeptUserIdsBy($userid, $roles, $role_ids);
-        //$dept_ids = SystemRoleDept::mk()->whereIn('role_id', $role_ids)->column('dept_id');
     }
 
     /**

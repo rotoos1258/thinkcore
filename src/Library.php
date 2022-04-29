@@ -1,7 +1,6 @@
 <?php
 
 
-
 namespace think\admin;
 
 use Closure;

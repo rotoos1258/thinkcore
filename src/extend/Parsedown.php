@@ -1,6 +1,5 @@
 <?php
 
-
 namespace think\admin\extend;
 
 /**

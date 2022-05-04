@@ -46,6 +46,19 @@ class PageHelper extends Helper
             }
             // 生成分页数据
             $data = ($paginate = $query->paginate(['list_rows' => $limit, 'query' => $get], $this->getCount($query, $total)))->toArray();
+            //有图片的数据列表获取图片信息
+            $que = $this->buildQuery($dbQuery);
+            if (method_exists($que, 'getTableFields')) {
+                $fields = $que->getTableFields();
+                if (in_array('image_id', $fields)){
+                    foreach($data['data'] as &$v){
+                        if($v['image_id']){
+                            $ids = explode(',',$v['image_id']);
+                            $v['image'] = $this->autoSortQuery('sys_upload_file')->whereIn('id',$ids)->select()->toArray();
+                        }
+                    }
+                }
+            }
             $result = ['page' => ['limit' => $data['per_page'], 'total' => $data['total'], 'pages' => $data['last_page'], 'current' => $data['current_page']], 'list' => $data['data']];
             // 分页跳转参数
         } else {

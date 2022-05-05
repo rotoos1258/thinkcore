@@ -276,7 +276,8 @@ class QueryHelper extends Helper
             if (is_callable($befor)) {
                 call_user_func($befor, $this, $this->query);
             }
-            $this->class->fetch($template);
+            return $this;
+            //$this->class->fetch($template);
         }
     }
 
